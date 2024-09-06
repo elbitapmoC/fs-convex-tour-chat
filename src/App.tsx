@@ -2,6 +2,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { useEffect, useState } from "react";
 import { faker } from "@faker-js/faker";
+import { like } from "../convex/messages";
 
 // For demo purposes. In a real app, you'd have real user data.
 const NAME = faker.person.firstName();
@@ -9,6 +10,7 @@ const NAME = faker.person.firstName();
 export default function App() {
   const messages = useQuery(api.messages.list);
   const sendMessage = useMutation(api.messages.send);
+  const likeMessage = useMutation(api.messages.like);
 
   const [newMessageText, setNewMessageText] = useState("");
 
@@ -34,18 +36,15 @@ export default function App() {
         >
           <div>{message.author}</div>
 
-          <p
-            onDoubleClick={async (e) => {
-              console.log("❤️", message.body);
-            }}
-            style={{ position: "relative" }}
-          >
+          <p>
             {message.body}
-            <aside
-              style={{ position: "absolute", right: "1rem", bottom: "-1rem" }}
+            <button
+              onClick={async () => {
+                await likeMessage({ liker: NAME, messageId: message._id });
+              }}
             >
-              ❤️
-            </aside>
+              {message.likes ? <span>{message.likes}</span> : null} 🤍
+            </button>
           </p>
         </article>
       ))}
